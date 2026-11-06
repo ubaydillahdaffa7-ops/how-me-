@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>King Dafzz</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  :root {
+    --blue: #1565c0; --blue-dark: #0d47a1; --blue-mid: #1976d2;
+    --blue-light: #64b5f6; --blue-pale: #e3f2fd;
+    --ink: #0a1929; --ink-soft: #546e7a;
+    --white: #ffffff; --line: #cfd8dc;
+    --paper: #fffdf7; --paper-line: #eef3f9;
+  }
+  html, body {
+    min-height: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: #f2f7fc; color: var(--ink);
+    -webkit-font-smoothing: antialiased; line-height: 1.5;
+  }
+
+  /* === BACKGROUND DOT PATTERN BERGERAK === */
+  body::before {
+    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background-image: radial-gradient(circle, rgba(21,101,192,.08) 1px, transparent 1px);
+    background-size: 22px 22px;
+    animation: bgDrift 45s linear infinite;
+  }
+  @keyframes bgDrift {
+    0%   { background-position: 0 0; }
+    100% { background-position: 22px 44px; }
+  }
+
+  #app { position: relative; z-index: 1; max-width: 520px; margin: 0 auto; min-height: 100vh; padding: 20px 16px 40px; }
+
+  /* === SCREEN === */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* === ANIMASI KOTAK NAIK DARI BAWAH === */
+  @keyframes riseUp {
+    0%   { opacity: 0; transform: translateY(52px) scale(.98); }
+    65%  { opacity: 1; transform: translateY(-5px)  scale(1); }
+    100% { opacity: 1; transform: translateY(0)     scale(1); }
+  }
+  .screen.active > * {
+    animation: riseUp .6s cubic-bezier(.22,.9,.3,1) both;
+    transform-origin: bottom center;
+  }
+  .screen.active > *:nth-child(2) { animation-delay: .07s; }
+  .screen.active > *:nth-child(3) { animation-delay: .14s; }
+  .screen.active > *:nth-child(4) { animation-delay: .21s; }
+  .screen.active > *:nth-child(5) { animation-delay: .28s; }
+  .screen.active > *:nth-child(6) { animation-delay: .35s; }
+  .screen.active > *:nth-child(7) { animation-delay: .42s; }
+  .screen.active > *:nth-child(8) { animation-delay: .49s; }
+  .screen.active > *:nth-child(9) { animation-delay: .56s; }
+  .screen.active > *:nth-child(10){ animation-delay: .63s; }
+  .screen.active > *:nth-child(11){ animation-delay: .70s; }
+  .screen.active > *:nth-child(12){ animation-delay: .77s; }
+
+  /* menu dashboard: naik dari bawah lebih dramatis + menempel bawah */
+  @keyframes riseUpBig {
+    0%   { opacity: 0; transform: translateY(90px) scale(.96); }
+    60%  { opacity: 1; transform: translateY(-6px) scale(1); }
+    100% { opacity: 1; transform: translateY(0)    scale(1); }
+  }
+  #dashboard.active .menu-card {
+    animation: riseUpBig .65s cubic-bezier(.22,.9,.3,1) both;
+    transform-origin: bottom center;
+  }
+  #dashboard.active .menu-card:nth-child(1) { animation-delay: .10s; }
+  #dashboard.active .menu-card:nth-child(2) { animation-delay: .22s; }
+  #dashboard.active .menu-card:nth-child(3) { animation-delay: .34s; }
+  #dashboard.active .menu-card:nth-child(4) { animation-delay: .46s; }
+
+  /* === RIPPLE === */
+  @keyframes rippleExpand { to { transform: scale(2.4); opacity: 0; } }
+  .ripple-el {
+    position: absolute; border-radius: 50%;
+    background: rgba(21,101,192,.18); pointer-events: none;
+    transform: scale(0); animation: rippleExpand .65s ease-out;
+  }
+
+  /* === SPLASH === */
+  .emblem {
+    background: var(--white); border: 1px solid var(--line);
+    border-radius: 22px; padding: 40px 24px 28px;
+    text-align: center; box-shadow: 0 6px 28px rgba(13,71,161,0.08);
+    margin-top: 28px; position: relative; overflow: hidden;
+  }
+  .emblem::before {
+    content: ""; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+    background: linear-gradient(90deg, var(--blue), var(--blue-light));
+  }
+  .emblem-frame {
+    width: 128px; height: 128px; border-radius: 50%; overflow: hidden;
+    margin: 0 auto 18px; border: 4px solid var(--blue-pale);
+    background: var(--blue-pale);
+    box-shadow: 0 0 0 2px var(--white), 0 0 0 4px var(--blue-light);
+    animation: pulseRing 2.5s ease-in-out infinite;
+  }
+  @keyframes pulseRing {
+    0%,100% { box-shadow: 0 0 0 2px var(--white), 0 0 0 4px var(--blue-light); }
+    50%     { box-shadow: 0 0 0 2px var(--white), 0 0 0 6px var(--blue-light); }
+  }
+  .emblem-frame img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .emblem h1 { font-size: 1.35rem; letter-spacing: -.2px; color: var(--ink); }
+  .emblem-sub { color: var(--ink-soft); font-size: .82rem; margin-top: 2px; letter-spacing: .5px; text-transform: uppercase; }
+  .emblem-info {
+    margin: 22px 0 24px; border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line); padding: 14px 0; text-align: left;
+  }
+  .info-row {
+    display: flex; justify-content: space-between; gap: 12px;
+    padding: 7px 4px; font-size: .92rem;
+  }
+  .info-row span:first-child { color: var(--ink-soft); }
+  .info-row span:last-child { font-weight: 600; color: var(--ink); text-align: right; }
+
+  /* === BUTTONS === */
+  .btn {
+    position: relative; overflow: hidden;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    border: none; cursor: pointer; font-family: inherit;
+    font-size: .95rem; font-weight: 600; letter-spacing: .2px;
+    padding: 13px 24px; border-radius: 10px; width: 100%;
+    transition: transform .12s ease, background .15s ease, box-shadow .15s ease;
+  }
+  .btn:active { transform: scale(.98); }
+  .btn-primary { background: var(--blue); color: #fff; box-shadow: 0 4px 14px rgba(21,101,192,.28); }
+  .btn-primary:hover { background: var(--blue-dark); box-shadow: 0 6px 20px rgba(21,101,192,.35); }
+  .btn-outline { background: #fff; color: var(--blue); border: 1.5px solid var(--blue); }
+  .btn-outline:hover { background: var(--blue-pale); }
+  .btn-danger { background: #fff; color: #c62828; border: 1.5px solid #c62828; }
+  .btn-danger:hover { background: #ffebee; }
+  .btn-back {
+    position: relative; overflow: hidden;
+    background: #fff; border: 1.5px solid var(--line); color: var(--ink);
+    width: 42px; height: 42px; border-radius: 10px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    transition: all .15s ease;
+  }
+  .btn-back:hover { background: var(--blue-pale); border-color: var(--blue-light); transform: translateX(-2px); }
+
+  /* === PAPER === */
+  .paper {
+    background-color: var(--paper);
+    background-image: repeating-linear-gradient(
+      to bottom, transparent 0px, transparent 30px,
+      var(--paper-line) 30px, var(--paper-line) 31px
+    );
+    border: 1px solid #e6edf4; border-radius: 14px;
+    padding: 26px 22px; box-shadow: 0 4px 20px rgba(13,71,161,0.07);
+    margin-top: 20px; position: relative; overflow: hidden;
+  }
+  .paper::before {
+    content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+    background: var(--blue); border-radius: 14px 0 0 14px; opacity: .8;
+  }
+  .paper::after {
+    content: ""; position: absolute; top: 0; right: 0; width: 26px; height: 26px;
+    background: linear-gradient(225deg, transparent 50%, rgba(21,101,192,0.14) 50%);
+    pointer-events: none;
+  }
+  .paper-q { font-size: 1.2rem; font-weight: 700; color: var(--ink); margin-bottom: 20px; }
+
+  /* === ROLE === */
+  .role-options { display: grid; gap: 12px; }
+  .role-card {
+    position: relative; overflow: hidden;
+    background: #fff; border: 2px solid var(--line); border-radius: 12px;
+    padding: 18px 20px; text-align: left; cursor: pointer;
+    font-family: inherit; font-size: 1rem; font-weight: 600; color: var(--ink);
+    display: flex; align-items: center; justify-content: space-between;
+    transition: all .18s ease;
+  }
+  .role-card:hover { border-color: var(--blue); background: var(--blue-pale); transform: translateY(-2px); box-shadow: 0 6px 18px rgba(21,101,192,.12); }
+  .role-card:hover svg { transform: scale(1.15); transition: transform .2s ease; }
+  .role-card svg { color: var(--blue); }
+
+  /* === DASHBOARD === */
+  #dashboard.active {
+    display: flex; flex-direction: column;
+    min-height: calc(100vh - 60px);
+  }
+  #dashboard.active .dash-banner { animation: riseUp .6s cubic-bezier(.22,.9,.3,1) both; }
+  #dashboard.active .menu-grid  { margin-top: auto; animation: none; }
+  #dashboard.active .sig        { animation: riseUp .6s cubic-bezier(.22,.9,.3,1) both; animation-delay: .55s; }
+
+  .dash-banner {
+    background: var(--white); border: 1px solid var(--line); border-radius: 14px;
+    padding: 18px 20px; margin-bottom: 14px; position: relative; overflow: hidden;
+    box-shadow: 0 2px 10px rgba(13,71,161,.05);
+  }
+  .dash-banner::before {
+    content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+    background: var(--blue);
+  }
+  .dash-banner p { font-size: .74rem; color: var(--ink-soft); letter-spacing: .8px; text-transform: uppercase; font-weight: 600; }
+  .dash-banner h2 { font-size: 1.3rem; color: var(--ink); margin: 3px 0 8px; letter-spacing: -.3px; }
+  .dash-badge {
+    display: inline-block; background: var(--blue-pale); color: var(--blue-dark);
+    font-size: .7rem; font-weight: 700; padding: 3px 9px; border-radius: 20px;
+    letter-spacing: .5px;
+  }
+  .menu-grid { display: grid; gap: 12px; }
+  .menu-card {
+    position: relative; overflow: hidden;
+    background: #fff; border: 1px solid var(--line); border-radius: 14px;
+    padding: 18px; cursor: pointer; font-family: inherit; text-align: left;
+    display: flex; align-items: center; gap: 14px;
+    transition: all .18s ease; box-shadow: 0 3px 12px rgba(13,71,161,.06);
+  }
+  .menu-card::before {
+    content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+    background: var(--blue); transform: scaleY(0); transform-origin: bottom;
+    transition: transform .28s ease;
+  }
+  .menu-card:hover { border-color: var(--blue-light); box-shadow: 0 8px 22px rgba(21,101,192,.16); transform: translateY(-3px); }
+  .menu-card:hover::before { transform: scaleY(1); }
+  .menu-card:hover .menu-icon {
+    background: var(--blue); color: #fff;
+    animation: iconBounce .55s ease;
+  }
+  @keyframes iconBounce {
+    0%,100% { transform: translateY(0) scale(1); }
+    45%     { transform: translateY(-5px) scale(1.1); }
+  }
+  .menu-icon {
+    width: 44px; height: 44px; border-radius: 11px; background: var(--blue-pale);
+    display: flex; align-items: center; justify-content: center; color: var(--blue);
+    flex-shrink: 0; transition: all .25s ease;
+  }
+  .menu-body { flex: 1; }
+  .menu-title { font-weight: 700; font-size: 1rem; color: var(--ink); }
+  .menu-desc { font-size: .8rem; color: var(--ink-soft); margin-top: 1px; }
+  .menu-arrow { color: var(--blue-light); transition: transform .2s ease; }
+  .menu-card:hover .menu-arrow { transform: translateX(3px); color: var(--blue); }
+
+  /* === SUB HEADER === */
+  .sub-header { display: flex; align-items: center; gap: 12px; padding: 4px 0 18px; }
+  .sub-header h2 { font-size: 1.15rem; color: var(--ink); }
+  .sub-header p { font-size: .78rem; color: var(--ink-soft); }
+
+  /* === SOCIAL LIST === */
+  .list-card {
+    background: #fff; border: 1px solid var(--line); border-radius: 14px;
+    overflow: hidden; margin-bottom: 18px;
+  }
+  .list-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 16px; border-bottom: 1px solid var(--line); font-size: .92rem;
+    transition: background .15s ease;
+  }
+  .list-item:hover { background: var(--blue-pale); }
+  .list-item:last-child { border-bottom: none; }
+  .list-ico {
+    width: 36px; height: 36px; border-radius: 9px; background: var(--blue-pale);
+    display: flex; align-items: center; justify-content: center; color: var(--blue); flex-shrink: 0;
+    transition: all .2s ease;
+  }
+  .list-item:hover .list-ico { background: var(--blue); color: #fff; }
+  .list-label { color: var(--ink-soft); font-size: .78rem; }
+  .list-value { font-weight: 600; color: var(--ink); word-break: break-all; }
+  .list-item.disabled .list-value { color: #b0bec5; }
+  .section-title {
+    font-size: .78rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+    color: var(--blue); margin: 8px 4px 10px;
+  }
+  .proj-link {
+    position: relative; overflow: hidden;
+    display: flex; align-items: center; gap: 10px;
+    background: #fff; border: 1px solid var(--line); border-radius: 11px;
+    padding: 12px 14px; margin-bottom: 8px;
+    color: var(--blue); text-decoration: none; font-size: .88rem; font-weight: 500;
+    transition: all .18s ease;
+  }
+  .proj-link:hover { background: var(--blue-pale); border-color: var(--blue-light); transform: translateX(3px); }
+  .proj-link span { flex: 1; word-break: break-all; }
+  .latest-badge {
+    background: var(--blue); color: #fff; font-size: .62rem; font-weight: 700;
+    padding: 3px 7px; border-radius: 5px; letter-spacing: .5px; flex-shrink: 0;
+  }
+
+  /* === QUIZ === */
+  .quiz-progress { height: 6px; background: var(--blue-pale); border-radius: 3px; overflow: hidden; margin-bottom: 18px; }
+  .quiz-progress-bar { height: 100%; background: var(--blue); width: 0%; transition: width .3s ease; }
+  .q-text { font-size: 1.05rem; font-weight: 700; margin-bottom: 18px; color: var(--ink); }
+  .opt {
+    position: relative; overflow: hidden;
+    display: block; width: 100%; text-align: left;
+    background: #fff; border: 1.5px solid var(--line); border-radius: 11px;
+    padding: 14px 16px; margin-bottom: 9px; cursor: pointer;
+    font-family: inherit; font-size: .93rem; color: var(--ink); transition: all .15s ease;
+  }
+  .opt:hover { border-color: var(--blue-light); background: var(--blue-pale); transform: translateX(2px); }
+  .essay-box {
+    width: 100%; min-height: 120px; resize: vertical;
+    border: 1.5px solid var(--line); border-radius: 11px; padding: 13px 15px;
+    font-family: inherit; font-size: .93rem; color: var(--ink); background: #fff; outline: none;
+  }
+  .essay-box:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(21,101,192,.1); }
+  .match-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .match-col { display: flex; flex-direction: column; gap: 8px; }
+  .match-item {
+    position: relative; overflow: hidden;
+    background: #fff; border: 1.5px solid var(--line); border-radius: 10px;
+    padding: 11px 12px; font-size: .85rem; cursor: pointer; font-family: inherit;
+    color: var(--ink); text-align: left; transition: all .15s ease;
+  }
+  .match-item:hover { border-color: var(--blue-light); }
+  .match-item.sel { border-color: var(--blue); background: var(--blue-pale); }
+  .match-item.done { border-color: var(--blue); background: var(--blue-pale); color: var(--blue); font-weight: 600; cursor: default; }
+  .match-item.wrong { border-color: #e57373; background: #ffebee; animation: shake .3s; }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-4px)} 75%{transform:translateX(4px)} }
+
+  /* === RESULT === */
+  .result-screen { text-align: center; padding-top: 40px; }
+  .result-box {
+    background: #fff; border: 1px solid var(--line); border-radius: 18px;
+    padding: 32px 24px; box-shadow: 0 6px 24px rgba(13,71,161,.08);
+  }
+  .result-score { font-size: 3rem; font-weight: 800; color: var(--blue); line-height: 1; margin-bottom: 6px; }
+  .result-score small { font-size: 1rem; color: var(--ink-soft); font-weight: 500; }
+  .result-title { font-size: 1.25rem; font-weight: 700; margin: 16px 0 20px; color: var(--ink); }
+
+  /* === STORY === */
+  .story-paper { min-height: 280px; }
+  .story-text {
+    font-size: .95rem; color: var(--ink); white-space: pre-wrap; word-break: break-word;
+    line-height: 31px; min-height: 200px;
+  }
+  .cursor-blink { display: inline-block; width: 2px; height: 16px; background: var(--blue); vertical-align: middle; margin-left: 1px; animation: blink .8s steps(2) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .info-card {
+    background: #fff; border: 1px solid var(--line); border-radius: 14px;
+    padding: 20px 18px; margin-top: 18px;
+    box-shadow: 0 4px 18px rgba(13,71,161,.08);
+    animation: riseUp .6s cubic-bezier(.22,.9,.3,1) both;
+  }
+  .info-card h3 {
+    font-size: .8rem; letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--blue); margin-bottom: 12px; padding-bottom: 10px;
+    border-bottom: 1px solid var(--line);
+  }
+  .info-card .info-row { padding: 6px 0; font-size: .88rem; }
+
+  /* === COUNTDOWN === */
+  .cd-card {
+    background: var(--white); border: 1px solid var(--line); border-radius: 18px;
+    padding: 32px 20px 26px; text-align: center;
+    box-shadow: 0 6px 24px rgba(13,71,161,.08); position: relative; overflow: hidden;
+  }
+  .cd-card::before {
+    content: ""; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+    background: linear-gradient(90deg, var(--blue), var(--blue-light));
+  }
+  .cd-label {
+    font-size: .74rem; letter-spacing: 1.8px; text-transform: uppercase;
+    color: var(--blue); font-weight: 700;
+  }
+  .cd-date {
+    font-size: 1.6rem; font-weight: 800; color: var(--ink);
+    margin: 4px 0 22px; letter-spacing: -.5px;
+  }
+  .cd-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 20px; }
+  .cd-box {
+    background: var(--blue-pale); border-radius: 10px; padding: 16px 4px;
+    border: 1px solid rgba(21,101,192,0.12);
+    transition: transform .15s ease, background .15s ease;
+  }
+  .cd-box:hover { background: #d8ecff; transform: translateY(-2px); }
+  .cd-num {
+    font-size: 1.55rem; font-weight: 800; color: var(--blue-dark);
+    font-variant-numeric: tabular-nums; letter-spacing: -.5px;
+    display: inline-block; transition: transform .15s ease, color .15s ease;
+  }
+  .cd-num.tick { transform: scale(1.18); color: var(--blue); }
+  .cd-unit {
+    font-size: .66rem; letter-spacing: .9px; text-transform: uppercase;
+    color: var(--ink-soft); margin-top: 3px; font-weight: 600;
+  }
+  .cd-progress {
+    height: 4px; background: var(--blue-pale); border-radius: 2px;
+    overflow: hidden; margin-bottom: 16px;
+  }
+  .cd-progress-fill {
+    height: 100%; background: var(--blue); width: 0%;
+    transition: width .5s ease; position: relative; overflow: hidden;
+  }
+  .cd-progress-fill::after {
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,.7), transparent);
+    animation: shimmer 1.8s infinite;
+  }
+  @keyframes shimmer {
+    0%   { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+  .cd-info { font-size: .82rem; color: var(--ink-soft); }
+  .cd-info strong { color: var(--blue-dark); }
+  .cd-celebrate {
+    margin-top: 16px; padding: 14px; border-radius: 12px;
+    background: var(--blue-pale); border: 1px dashed var(--blue);
+    color: var(--blue-dark); font-weight: 700; font-size: .92rem;
+    animation: pop .5s ease;
+  }
+  @keyframes pop { 0%{transform:scale(.9);opacity:0} 100%{transform:scale(1);opacity:1} }
+
+  /* === SIG === */
+  .sig {
+    text-align: center; font-size: .72rem; color: var(--ink-soft);
+    letter-spacing: 1px; margin-top: 22px; padding-top: 14px;
+    border-top: 1px dashed var(--line); opacity: .75;
+  }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- SPLASH -->
+  <div class="screen active" id="splash">
+    <div class="emblem">
+      <div class="emblem-frame">
+        <img id="profileImg" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><rect width='200' height='200' fill='%23e3f2fd'/><circle cx='100' cy='78' r='34' fill='%231565c0'/><ellipse cx='100' cy='185' rx='62' ry='56' fill='%231565c0'/></svg>" alt="Foto Daffa">
+      </div>
+      <h1>Daffa Ubaidillah</h1>
+      <p class="emblem-sub">King Dafzz</p>
+      <div class="emblem-info">
+        <div class="info-row"><span>Nama</span><span>Daffa Ubaidillah</span></div>
+        <div class="info-row"><span>Umur</span><span>14 tahun</span></div>
+        <div class="info-row"><span>Tgl Lahir</span><span>13 September 2012</span></div>
+      </div>
+      <button class="btn btn-primary" id="btnLanjut">
+        Lanjut
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- ROLE -->
+  <div class="screen" id="role">
+    <div class="paper">
+      <p class="paper-q">Siapa kamu?</p>
+      <div class="role-options">
+        <button class="role-card" data-role="teman">
+          <span>Teman</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </button>
+        <button class="role-card" data-role="musisi">
+          <span>Musisi</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="screen" id="dashboard">
+    <div class="dash-banner">
+      <p>Selamat datang kembali</p>
+      <h2>Daffa Ubaidillah</h2>
+      <span class="dash-badge">King Dafzz</span>
+    </div>
+    <div class="menu-grid">
+      <button class="menu-card" data-menu="social">
+        <div class="menu-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/></svg>
+        </div>
+        <div class="menu-body">
+          <div class="menu-title">Social Media</div>
+          <div class="menu-desc">5 akun &middot; 5 projek</div>
+        </div>
+        <svg class="menu-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+
+      <button class="menu-card" data-menu="foryou">
+        <div class="menu-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg>
+        </div>
+        <div class="menu-body">
+          <div class="menu-title">For You</div>
+          <div class="menu-desc">20 soal &middot; maks 100</div>
+        </div>
+        <svg class="menu-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+
+      <button class="menu-card" data-menu="mee">
+        <div class="menu-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <div class="menu-body">
+          <div class="menu-title">Mee</div>
+          <div class="menu-desc">Cerita &middot; Info</div>
+        </div>
+        <svg class="menu-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+
+      <button class="menu-card" data-menu="countdown">
+        <div class="menu-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6M12 2v3"/></svg>
+        </div>
+        <div class="menu-body">
+          <div class="menu-title">Hitung Mundur</div>
+          <div class="menu-desc">Menuju ulang tahun</div>
+        </div>
+        <svg class="menu-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+    </div>
+    <div class="sig">— KING DAFZZ —</div>
+  </div>
+
+  <!-- SOCIAL -->
+  <div class="screen" id="social">
+    <div class="sub-header">
+      <button class="btn-back" data-back="dashboard">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+      </button>
+      <div><h2>Social Media</h2><p>Akun resmi Daffa</p></div>
+    </div>
+
+    <div class="list-card">
+      <div class="list-item">
+        <div class="list-ico">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16.6 5.82s.51.5 0 0A4.28 4.28 0 0 1 15.54 3h-3.09v12.4a2.59 2.59 0 1 1-1.85-2.48V9.75a5.66 5.66 0 1 0 4.95 5.6V8.86a7.35 7.35 0 0 0 4.3 1.38V7.15s-1.93.12-3.25-1.33z"/></svg>
+        </div>
+        <div style="flex:1"><div class="list-label">TikTok</div><div class="list-value">daffaubaydillah95</div></div>
+      </div>
+      <div class="list-item">
+        <div class="list-ico">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23 7.2s-.2-1.6-.9-2.3c-.9-.9-1.8-.9-2.3-1C16.7 3.6 12 3.6 12 3.6s-4.7 0-7.8.3c-.4 0-1.4 0-2.3 1-.7.7-.9 2.3-.9 2.3S.8 9.1.8 11v1.8c0 1.9.2 3.8.2 3.8s.2 1.6.9 2.3c.9.9 2 .9 2.5 1 1.8.2 7.6.3 7.6.3s4.7 0 7.8-.3c.4-.1 1.4-.1 2.3-1 .7-.7.9-2.3.9-2.3s.2-1.9.2-3.8V11c0-1.9-.2-3.8-.2-3.8zM9.8 15.1V8.4l6.2 3.4-6.2 3.3z"/></svg>
+        </div>
+        <div style="flex:1"><div class="list-label">YouTube</div><div class="list-value">@KINGDAFZZ-n3x</div></div>
+      </div>
+      <div class="list-item disabled">
+        <div class="list-ico">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 12h4M8 10v4M15 13h.01M18 11h.01"/><rect x="2" y="6" width="20" height="12" rx="3"/></svg>
+        </div>
+        <div style="flex:1"><div class="list-label">MLBB</div><div class="list-value">—</div></div>
+      </div>
+      <div class="list-item">
+        <div class="list-ico">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2s6 4 6 10a6 6 0 0 1-12 0c0-6 6-10 6-10z"/><path d="M9.5 12.5l1.5 1.5 3.5-3.5"/></svg>
+        </div>
+        <div style="flex:1"><div class="list-label">Free Fire</div><div class="list-value">10247166557</div></div>
+      </div>
+    </div>
+
+    <p class="section-title">My Projek</p>
+    <a class="proj-link" href="https://my-life-dafzz.onrender.com" target="_blank" rel="noopener">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6M10 14L21 3"/></svg>
+      <span>my-life-dafzz.onrender.com</span>
+    </a>
+    <a class="proj-link" href="https://belajar-si.onrender.com" target="_blank" rel="noopener">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6M10 14L21 3"/></svg>
+      <span>belajar-si.onrender.com</span>
+    </a>
+    <a class="proj-link" href="https://hacker-kingdafzz-1.onrender.com/" target="_blank" rel="noopener">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6M10 14L21 3"/></svg>
+      <span>hacker-kingdafzz-1.onrender.com</span>
+    </a>
+    <a class="proj-link" href="https://hollow-dafzz.onrender.com" target="_blank" rel="noopener">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6M10 14L21 3"/></svg>
+      <span>hollow-dafzz.onrender.com</span>
+    </a>
+    <a class="proj-link" href="https://jadwal-sekolah.onrender.com/" target="_blank" rel="noopener">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6M10 14L21 3"/></svg>
+      <span>jadwal-sekolah.onrender.com</span>
+      <span class="latest-badge">LATEST</span>
+    </a>
+  </div>
+
+  <!-- FOR YOU -->
+  <div class="screen" id="foryou">
+    <div class="sub-header">
+      <button class="btn-back" data-back="dashboard">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+      </button>
+      <div><h2>For You</h2><p>20 soal tentang Daffa</p></div>
+    </div>
+    <div class="quiz-progress"><div class="quiz-progress-bar" id="quizBar"></div></div>
+    <div id="quizBody"></div>
+  </div>
+
+  <!-- MEE -->
+  <div class="screen" id="mee">
+    <div class="sub-header">
+      <button class="btn-back" data-back="dashboard">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+      </button>
+      <div><h2>Mee</h2><p>Ceritaku</p></div>
+    </div>
+    <div class="paper story-paper">
+      <div class="story-text" id="storyText"></div>
+    </div>
+    <div id="infoCardWrap"></div>
+  </div>
+
+  <!-- COUNTDOWN -->
+  <div class="screen" id="countdown">
+    <div class="sub-header">
+      <button class="btn-back" data-back="dashboard">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+      </button>
+      <div><h2>Hitung Mundur</h2><p>Menuju hari spesial</p></div>
+    </div>
+    <div class="cd-card">
+      <p class="cd-label">Ulang Tahun Daffa</p>
+      <p class="cd-date">13 September</p>
+      <div class="cd-grid">
+        <div class="cd-box"><div class="cd-num" id="cdDays">0</div><div class="cd-unit">Hari</div></div>
+        <div class="cd-box"><div class="cd-num" id="cdHours">00</div><div class="cd-unit">Jam</div></div>
+        <div class="cd-box"><div class="cd-num" id="cdMins">00</div><div class="cd-unit">Menit</div></div>
+        <div class="cd-box"><div class="cd-num" id="cdSecs">00</div><div class="cd-unit">Detik</div></div>
+      </div>
+      <div class="cd-progress"><div class="cd-progress-fill" id="cdProgress"></div></div>
+      <p class="cd-info" id="cdInfo"></p>
+      <div id="cdCelebrate"></div>
+    </div>
+    <div class="sig">— KING DAFZZ —</div>
+  </div>
+
+</div>
+
+<script>
+/* ============ AUDIO ============ */
+let audioCtx = null;
+function initAudio() {
+  if (!audioCtx) { try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {} }
+  if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+}
+function playClick() {
+  initAudio(); if (!audioCtx) return;
+  const t = audioCtx.currentTime;
+  const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+  o.type = 'sine';
+  o.frequency.setValueAtTime(950, t);
+  o.frequency.exponentialRampToValueAtTime(480, t + 0.05);
+  g.gain.setValueAtTime(0.07, t);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + 0.07);
+  o.connect(g); g.connect(audioCtx.destination); o.start(t); o.stop(t + 0.08);
+}
+function playType() {
+  initAudio(); if (!audioCtx) return;
+  const t = audioCtx.currentTime;
+  const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+  o.type = 'square';
+  o.frequency.setValueAtTime(380 + Math.random() * 260, t);
+  g.gain.setValueAtTime(0.025, t);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + 0.035);
+  o.connect(g); g.connect(audioCtx.destination); o.start(t); o.stop(t + 0.04);
+}
+function playPaper() {
+  initAudio(); if (!audioCtx) return;
+  const sr = audioCtx.sampleRate;
+  const buf = audioCtx.createBuffer(1, sr * 0.35, sr);
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 2);
+  const src = audioCtx.createBufferSource(); src.buffer = buf;
+  const f = audioCtx.createBiquadFilter(); f.type = 'highpass'; f.frequency.value = 1200;
+  const g = audioCtx.createGain(); g.gain.setValueAtTime(0.12, audioCtx.currentTime);
+  src.connect(f); f.connect(g); g.connect(audioCtx.destination); src.start();
+}
+
+/* ============ RIPPLE ============ */
+function addRipple(e, el) {
+  const rect = el.getBoundingClientRect();
+  const size = Math.max(rect.width, rect.height) * 1.2;
+  const x = (e.clientX || (rect.left + rect.width / 2)) - rect.left - size / 2;
+  const y = (e.clientY || (rect.top + rect.height / 2)) - rect.top - size / 2;
+  const r = document.createElement('span');
+  r.className = 'ripple-el';
+  r.style.width = r.style.height = size + 'px';
+  r.style.left = x + 'px';
+  r.style.top = y + 'px';
+  el.appendChild(r);
+  setTimeout(() => r.remove(), 650);
+}
+document.addEventListener('pointerdown', e => {
+  const el = e.target.closest('.btn, .menu-card, .role-card, .opt, .match-item, .proj-link, .btn-back');
+  if (el) addRipple(e, el);
+}, { passive: true });
+
+/* ============ NAV ============ */
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'instant' });
+}
+
+/* ============ SPLASH ============ */
+document.getElementById('btnLanjut').addEventListener('click', () => {
+  playClick(); playPaper(); showScreen('role');
+});
+
+/* ============ ROLE ============ */
+document.querySelectorAll('.role-card').forEach(btn => {
+  btn.addEventListener('click', () => {
+    playClick();
+    if (btn.dataset.role === 'teman') { showScreen('dashboard'); }
+    else {
+      const app = document.getElementById('app');
+      const old = document.querySelector('.screen.active');
+      if (old) old.classList.remove('active');
+      const div = document.createElement('div');
+      div.className = 'screen active';
+      div.innerHTML = `
+        <div class="paper" style="margin-top:40px;text-align:center;">
+          <p class="paper-q">Musisi</p>
+          <p style="color:var(--ink-soft);margin-bottom:20px;">Fitur musisi masih dalam pengembangan.</p>
+          <button class="btn btn-outline" id="backRoleBtn">Kembali</button>
+        </div>`;
+      app.appendChild(div);
+      div.querySelector('#backRoleBtn').addEventListener('click', () => { playClick(); div.remove(); showScreen('role'); });
+    }
+  });
+});
+
+/* ============ DASHBOARD ============ */
+document.querySelectorAll('.menu-card').forEach(btn => {
+  btn.addEventListener('click', () => {
+    playClick(); playPaper();
+    const m = btn.dataset.menu;
+    if (m === 'social') showScreen('social');
+    else if (m === 'foryou') { startQuiz(); showScreen('foryou'); }
+    else if (m === 'mee') { showScreen('mee'); startStory(); }
+    else if (m === 'countdown') { showScreen('countdown'); startCountdown(); }
+  });
+});
+
+/* ============ BACK ============ */
+document.querySelectorAll('[data-back]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    playClick();
+    if (document.getElementById('countdown').classList.contains('active') && cdTimer) {
+      clearInterval(cdTimer); cdTimer = null;
+    }
+    if (document.getElementById('mee').classList.contains('active')) {
+      storyStarted = false;
+      if (storyTimer) { clearInterval(storyTimer); storyTimer = null; }
+    }
+    showScreen(btn.dataset.back);
+  });
+});
+
+/* ============ QUIZ DATA ============ */
+const abcQ = [
+  { q: "Siapa nama lengkap Daffa?", o: ["Daffa Ubaidillah","Daffa Ubaid","Daffa Dafzz","King Dafzz"], a: 0 },
+  { q: "Berapa umur Daffa saat ini?", o: ["13 tahun","14 tahun","15 tahun","16 tahun"], a: 1 },
+  { q: "Kapan tanggal lahir Daffa?", o: ["13 September 2012","12 September 2013","12 September 2012","12 Agustus 2012"], a: 0 },
+  { q: "Apa hobi Daffa?", o: ["Nyanyi","Coding & push rangk","Main bola","Melukis"], a: 1 },
+  { q: "Apa warna favorit Daffa?", o: ["Merah","Hijau","Biru","Kuning"], a: 2 },
+  { q: "Apa makanan favorit Daffa?", o: ["Mie ayam","Bakso","Sate","Nasgor & ayam Geprek"], a: 3 },
+  { q: "Di kota mana Daffa tinggal?", o: ["Jember","Bondowoso","Surabaya","Malang"], a: 1 },
+  { q: "Apa akun TikTok Daffa?", o: ["daffa95","daffaubaydillah95","kingdafzz","daffaubaid"], a: 1 },
+  { q: "Apa nama channel YouTube Daffa?", o: ["@KINGDAFZZ-n3x","@daffaubay","@daffa95","@kingdaf"], a: 0 },
+  { q: "Daffa bersekolah di?", o: ["SMPN 1 Bondowoso","SMPN 2 Bondowoso","SMPN 3 Bondowoso","SMA 1 Bondowoso"], a: 1 }
+];
+const essayQ = [
+  { q: "Siapa nama lengkap Daffa?", keys: ["daffa","ubaidillah"] },
+  { q: "Apa hobi Daffa?", keys: ["coding","push"] },
+  { q: "Daffa sekarang duduk di kelas berapa?", keys: ["8","viii","delapan"] },
+  { q: "Sebutkan kota & kecamatan tempat tinggal Daffa!", keys: ["bondowoso","curahdami"] },
+  { q: "Apa nama channel YouTube Daffa?", keys: ["kingdafzz","king","dafzz"] }
+];
+const matchPairs = [
+  { left: "TikTok", right: "daffaubaydillah95" },
+  { left: "YouTube", right: "@KINGDAFZZ-n3x" },
+  { left: "Warna favorit", right: "Biru" },
+  { left: "Makanan favorit", right: "Nasgor & ayam Geprek" },
+  { left: "Hobi", right: "Coding & push rangk" }
+];
+
+/* ============ QUIZ ============ */
+let quiz = { step: 0, abcScore: 0, essayScore: 0, matchScore: 0, totalSteps: 16 };
+function resetQuiz() { quiz = { step: 0, abcScore: 0, essayScore: 0, matchScore: 0, totalSteps: 16 }; }
+function startQuiz() { resetQuiz(); renderQuiz(); }
+function updateBar() {
+  document.getElementById('quizBar').style.width = Math.min(100, (quiz.step / quiz.totalSteps) * 100) + '%';
+}
+function renderQuiz() {
+  updateBar();
+  const body = document.getElementById('quizBody');
+  body.innerHTML = '';
+  if (quiz.step < 10) renderABC(body, quiz.step);
+  else if (quiz.step < 15) renderEssay(body, quiz.step - 10);
+  else if (quiz.step === 15) renderMatch(body);
+  else renderResult(body);
+}
+function renderABC(body, idx) {
+  const q = abcQ[idx];
+  const card = document.createElement('div'); card.className = 'paper';
+  const num = document.createElement('div');
+  num.style.cssText = 'font-size:.72rem;color:var(--blue);font-weight:700;letter-spacing:1px;margin-bottom:6px;';
+  num.textContent = `SOAL ${idx + 1} / 10`;
+  const qt = document.createElement('p'); qt.className = 'q-text'; qt.textContent = q.q;
+  card.appendChild(num); card.appendChild(qt);
+  q.o.forEach((opt, i) => {
+    const b = document.createElement('button');
+    b.className = 'opt'; b.textContent = String.fromCharCode(65 + i) + '. ' + opt;
+    b.addEventListener('click', () => { playClick(); if (i === q.a) quiz.abcScore += 5; quiz.step++; renderQuiz(); });
+    card.appendChild(b);
+  });
+  body.appendChild(card);
+}
+function renderEssay(body, idx) {
+  const q = essayQ[idx];
+  const card = document.createElement('div'); card.className = 'paper';
+  const num = document.createElement('div');
+  num.style.cssText = 'font-size:.72rem;color:var(--blue);font-weight:700;letter-spacing:1px;margin-bottom:6px;';
+  num.textContent = `ESAI ${idx + 1} / 5`;
+  const qt = document.createElement('p'); qt.className = 'q-text'; qt.textContent = q.q;
+  const ta = document.createElement('textarea');
+  ta.className = 'essay-box'; ta.placeholder = 'Tulis jawabanmu di sini...';
+  const btn = document.createElement('button');
+  btn.className = 'btn btn-primary'; btn.style.marginTop = '14px'; btn.textContent = 'Lanjut';
+  btn.addEventListener('click', () => {
+    playClick();
+    const ans = ta.value.toLowerCase();
+    if (q.keys.every(k => ans.includes(k))) quiz.essayScore += 6;
+    quiz.step++; renderQuiz();
+  });
+  card.appendChild(num); card.appendChild(qt); card.appendChild(ta); card.appendChild(btn);
+  body.appendChild(card);
+}
+function renderMatch(body) {
+  const card = document.createElement('div'); card.className = 'paper';
+  const num = document.createElement('div');
+  num.style.cssText = 'font-size:.72rem;color:var(--blue);font-weight:700;letter-spacing:1px;margin-bottom:6px;';
+  num.textContent = 'MENJODOHKAN';
+  const qt = document.createElement('p'); qt.className = 'q-text'; qt.textContent = 'Jodohkan pasangan yang benar';
+  const hint = document.createElement('p');
+  hint.style.cssText = 'font-size:.8rem;color:var(--ink-soft);margin-bottom:14px;';
+  hint.textContent = 'Klik kiri lalu klik kanan untuk menjodohkan.';
+
+  const rightShuffled = matchPairs.map((p, i) => ({ text: p.right, origIdx: i }));
+  for (let i = rightShuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [rightShuffled[i], rightShuffled[j]] = [rightShuffled[j], rightShuffled[i]];
+  }
+  const wrap = document.createElement('div'); wrap.className = 'match-wrap';
+  const leftCol = document.createElement('div'); leftCol.className = 'match-col';
+  const rightCol = document.createElement('div'); rightCol.className = 'match-col';
+  let selectedLeft = null, selectedLeftEl = null;
+
+  matchPairs.forEach((p, i) => {
+    const b = document.createElement('button');
+    b.className = 'match-item'; b.textContent = p.left;
+    b.addEventListener('click', () => {
+      if (b.classList.contains('done')) return;
+      playClick();
+      if (selectedLeftEl) selectedLeftEl.classList.remove('sel');
+      if (selectedLeftEl === b) { selectedLeft = null; selectedLeftEl = null; return; }
+      selectedLeft = i; selectedLeftEl = b; b.classList.add('sel');
+    });
+    leftCol.appendChild(b);
+  });
+  rightShuffled.forEach(r => {
+    const b = document.createElement('button');
+    b.className = 'match-item'; b.textContent = r.text;
+    b.addEventListener('click', () => {
+      if (b.classList.contains('done') || selectedLeft === null) return;
+      playClick();
+      if (r.origIdx === selectedLeft) {
+        b.classList.add('done'); selectedLeftEl.classList.remove('sel');
+        selectedLeftEl.classList.add('done');
+        quiz.matchScore += 4;
+        selectedLeft = null; selectedLeftEl = null;
+      } else {
+        b.classList.add('wrong');
+        const tmp = b; setTimeout(() => tmp.classList.remove('wrong'), 400);
+      }
+    });
+    rightCol.appendChild(b);
+  });
+  wrap.appendChild(leftCol); wrap.appendChild(rightCol);
+  card.appendChild(num); card.appendChild(qt); card.appendChild(hint); card.appendChild(wrap);
+
+  const doneBtn = document.createElement('button');
+  doneBtn.className = 'btn btn-primary'; doneBtn.style.marginTop = '16px'; doneBtn.textContent = 'Selesai';
+  doneBtn.addEventListener('click', () => { playClick(); quiz.step++; renderQuiz(); });
+  card.appendChild(doneBtn);
+  body.appendChild(card);
+}
+function renderResult(body) {
+  updateBar();
+  const total = quiz.abcScore + quiz.essayScore + quiz.matchScore;
+  let title, btnText, btnClass, action;
+  if (total < 34) {
+    title = 'KELUAR LU MONYET 🐒🐵🙈'; btnText = 'Pergii'; btnClass = 'btn btn-danger';
+    action = () => showScreen('splash');
+  } else if (total < 60) {
+    title = 'Sok Asik bet lu ngapa in disini?'; btnText = 'Keluar'; btnClass = 'btn btn-danger';
+    action = () => showScreen('splash');
+  } else {
+    title = 'Halo Bestfriend'; btnText = 'Kembali ke Dashboard'; btnClass = 'btn btn-primary';
+    action = () => showScreen('dashboard');
+  }
+  const wrap = document.createElement('div');
+  wrap.className = 'result-screen';
+  wrap.innerHTML = `
+    <div class="result-box">
+      <div class="result-score">${total}<small> / 100</small></div>
+      <div class="result-title">${title}</div>
+      <button class="${btnClass}" id="resultBtn">${btnText}</button>
+    </div>`;
+  body.appendChild(wrap);
+  wrap.querySelector('#resultBtn').addEventListener('click', () => { playClick(); action(); });
+}
+
+/* ============ STORY ============ */
+const storyText = `Haloo semuanya perkenalkan aku  𓆩 ᖽᐸɪղᘜ ༒ ᙃᴀ̷𝖿ᴢᴢ 𓆪 bisa di panggil Daffa aj sih, sedikit cerita saja ya aku merupakan seorang anak yg cukup baik dan tidak terlalu baik juga, alasanku inggin sekolah di SMPN 2 Bondowoso karena adanya bayak hal" menarik dan extrakuler yg beragam, semoga di kelas VIIIA/8A ini aku bisa bersikap baik, dan saling menghormati ▄█▀█●
+
+𝙱𝚢  𓆩 ᖽᐸɪղᘜ ༒ ᙃᴀ̷𝖿ᴢᴢ 𓆪`;
+let storyTimer = null, storyStarted = false;
+
+function startStory() {
+  if (storyStarted) return;
+  storyStarted = true;
+  playPaper();
+  const el = document.getElementById('storyText');
+  const infoWrap = document.getElementById('infoCardWrap');
+  el.textContent = '';
+  infoWrap.innerHTML = '';
+  let i = 0;
+  const cursor = document.createElement('span');
+  cursor.className = 'cursor-blink';
+  el.appendChild(cursor);
+  if (storyTimer) clearInterval(storyTimer);
+  storyTimer = setInterval(() => {
+    if (i >= storyText.length) {
+      clearInterval(storyTimer); cursor.remove(); showInfoCard(); return;
+    }
+    const ch = storyText[i];
+    cursor.insertAdjacentText('beforebegin', ch);
+    if (ch.trim() !== '' && i % 2 === 0) playType();
+    i++;
+  }, 32);
+}
+function showInfoCard() {
+  const infoWrap = document.getElementById('infoCardWrap');
+  infoWrap.innerHTML = `
+    <div class="info-card">
+      <h3>My Info</h3>
+      <div class="info-row"><span>Nama</span><span>Daffa Ubaidillah</span></div>
+      <div class="info-row"><span>Umur</span><span>14 tahun</span></div>
+      <div class="info-row"><span>Hobi</span><span>Coding &amp; push rangk</span></div>
+      <div class="info-row"><span>Warna favorit</span><span>Biru</span></div>
+      <div class="info-row"><span>Makanan favorit</span><span>Nasgor &amp; ayam Geprek</span></div>
+      <div class="info-row"><span>Teman favorit</span><span>𝚋𝚎𝚕𝚞𝚖 𝚊𝚍𝚊𝚊</span></div>
+      <div class="info-row"><span>Alamat</span><span style="max-width:60%;">Jawa Timur, Bondowoso, Curahdami, Sumber Suko, RT 4 RW 1</span></div>
+      <div class="info-row"><span>Tgl lahir</span><span>13 September 2012</span></div>
+    </div>`;
+  playPaper();
+}
+
+/* ============ COUNTDOWN ============ */
+let cdTimer = null;
+const BD_DAY = 13, BD_MONTH = 8;
+
+function startCountdown() {
+  if (cdTimer) clearInterval(cdTimer);
+  updateCountdown();
+  cdTimer = setInterval(updateCountdown, 1000);
+}
+
+function setNum(id, val) {
+  const el = document.getElementById(id);
+  if (el.textContent !== String(val)) {
+    el.textContent = String(val);
+    el.classList.add('tick');
+    setTimeout(() => el.classList.remove('tick'), 180);
+  }
+}
+
+function updateCountdown() {
+  const now = new Date();
+  const thisYear = now.getFullYear();
+  const isToday = now.getMonth() === BD_MONTH && now.getDate() === BD_DAY;
+  let bd = new Date(thisYear, BD_MONTH, BD_DAY, 0, 0, 0);
+  if (bd.getTime() <= now.getTime() && !isToday) {
+    bd = new Date(thisYear + 1, BD_MONTH, BD_DAY, 0, 0, 0);
+  }
+  const diff = Math.max(0, bd.getTime() - now.getTime());
+  const days  = Math.floor(diff / 86400000);
+  const hours = Math.floor((diff % 86400000) / 3600000);
+  const mins  = Math.floor((diff % 3600000) / 60000);
+  const secs  = Math.floor((diff % 60000) / 1000);
+
+  setNum('cdDays', days);
+  setNum('cdHours', String(hours).padStart(2, '0'));
+  setNum('cdMins', String(mins).padStart(2, '0'));
+  setNum('cdSecs', String(secs).padStart(2, '0'));
+
+  const prevBD = new Date(bd.getFullYear() - 1, BD_MONTH, BD_DAY);
+  const totalSpan = bd.getTime() - prevBD.getTime();
+  const elapsed = now.getTime() - prevBD.getTime();
+  const pct = Math.max(0, Math.min(100, (elapsed / totalSpan) * 100));
+  document.getElementById('cdProgress').style.width = pct + '%';
+
+  const bdStr = bd.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+  document.getElementById('cdInfo').innerHTML = isToday
+    ? 'Hari ini hari ulang tahunmu! 🎉'
+    : `Ultah berikutnya: <strong>${bdStr}</strong>`;
+
+  const celWrap = document.getElementById('cdCelebrate');
+  if (isToday) {
+    if (!celWrap.querySelector('.cd-celebrate')) {
+      const cel = document.createElement('div');
+      cel.className = 'cd-celebrate';
+      cel.textContent = 'SELAMAT ULANG TAHUN, DAFFA! 🎂';
+      celWrap.appendChild(cel);
+    }
+  } else {
+    celWrap.innerHTML = '';
+  }
+}
+</script>
+</body>
+</html>
